@@ -2,33 +2,37 @@
 
 A structured 5-stage development workflow for AI coding agents: **Research → Plan → Scaffold → Build → Validate**.
 
-Works with [Claude Code](https://claude.com/claude-code), [OpenAI Codex CLI](https://github.com/openai/codex), and any agent platform that supports the [Agent Skills](https://developers.openai.com/codex/skills/) standard.
+Works with any agent that supports the [Agent Skills](https://agentskills.io) standard — including [Claude Code](https://claude.com/claude-code), [OpenAI Codex CLI](https://github.com/openai/codex), [Cursor](https://cursor.com), and [40+ other platforms](https://agentskills.io/home).
 
 Motif ensures you research before coding, plan with tradeoff analysis, track tasks explicitly, and validate against the original goal.
 
 ## Installation
 
-### Claude Code
+### Any Agent (via npx skills)
+
+```bash
+npx skills add zackbart/motif
+```
+
+This installs the `dev` skill to whichever agent platforms you have installed.
+
+### Claude Code (full plugin)
 
 ```bash
 claude plugin add zackbart/motif
 ```
 
-### Codex CLI
+Includes the core workflow plus additional commands (`optimize`, `update-docs`), a dedicated research subagent, and session hooks.
 
-Clone into your skills directory:
+### Codex CLI
 
 ```bash
 git clone https://github.com/zackbart/motif.git ~/.agents/skills/motif
 ```
 
-### Other Agent Platforms
-
-Copy the `skills/` and `commands/` directories into your agent's skill discovery path.
-
 ## Usage
 
-Run the full workflow:
+Invoke the `dev` skill using your agent's skill invocation method:
 
 ```
 /motif:dev <task description>        # Claude Code
@@ -66,30 +70,37 @@ Executes the plan by working through tasks in order. Stops and reports if blocke
 
 Verifies the implementation against the original request: goal check, test verification, diff review, and loose-end identification.
 
-## Additional Commands
+## Claude Code Extras
 
-| Command | Description |
+When installed as a Claude Code plugin, motif includes additional features:
+
+| Feature | Description |
 |---------|-------------|
-| `optimize` | Prompt drafting assistant for system and agentic prompts |
-| `update-docs` | Updates project documentation to reflect current codebase state |
+| Research subagent | Dedicated agent on Sonnet for faster, cheaper research |
+| `optimize` command | Prompt drafting assistant for system and agentic prompts |
+| `update-docs` command | Updates project documentation to reflect current codebase |
+| Session hooks | Reminds you about the workflow on session start |
 
-## Platform-Specific Features
+## Platform Compatibility
 
-| Feature | Claude Code | Codex CLI |
-|---------|-------------|-----------|
-| Research subagent | Dedicated agent (model: sonnet) | Inline in main context |
-| Task tracking | Native task tools | update_plan / werk CLI |
-| Session hooks | SessionStart hook | AGENTS.md |
-| Plugin distribution | Marketplace | Git clone |
+| Feature | Claude Code | Codex CLI | Other Agents |
+|---------|-------------|-----------|--------------|
+| 5-stage workflow | Yes | Yes | Yes |
+| Research subagent | Dedicated agent | Inline | Inline |
+| Task tracking | Native task tools | update_plan / werk | Platform-dependent / werk |
+| Extra commands | optimize, update-docs | — | — |
+| Distribution | Plugin marketplace | Git clone | npx skills |
 
 ## Project Structure
 
 ```
-skills/dev/     # Core 5-stage workflow + reference guides
-agents/         # Subagent definitions (Claude Code enhancement)
-commands/       # Additional commands (optimize, update-docs)
-hooks/          # Session lifecycle hooks (Claude Code)
-AGENTS.md       # Session priming (Codex CLI)
+skills/dev/          # Core 5-stage workflow (universal skill)
+  references/        # Prompt engineering reference guides
+agents/              # Research subagent (Claude Code)
+commands/            # Additional commands (Claude Code)
+hooks/               # Session lifecycle hooks (Claude Code)
+AGENTS.md            # Session priming (Codex CLI)
+.claude-plugin/      # Plugin manifest (Claude Code)
 ```
 
 ## License

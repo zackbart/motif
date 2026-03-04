@@ -5,6 +5,13 @@ description: >
   task — bug fixes, features, refactors, or explorations. Runs a 5-stage process:
   Research, Plan, Scaffold, Build, Validate. Supports native task tracking or
   the werk CLI for persistent tracking.
+license: MIT
+compatibility: >
+  Works with any agent that supports the Agent Skills standard. On Claude Code,
+  research can be delegated to a dedicated subagent for efficiency.
+metadata:
+  author: zackbart
+  version: "0.2.0"
 disable-model-invocation: true
 argument-hint: "[werk] <task description>"
 allowed-tools: "Read, Grep, Glob, Bash, Write, Edit, Agent, TaskCreate, TaskUpdate, TaskList, TaskGet, AskUserQuestion"
