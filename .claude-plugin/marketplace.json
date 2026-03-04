@@ -12,7 +12,7 @@
       "name": "motif",
       "description": "5-stage development workflow plugin — Research, Plan, Scaffold, Build, Validate. Language and codebase agnostic.",
       "version": "0.2.0",
-      "source": "."
+      "source": "./"
     }
   ]
 }
