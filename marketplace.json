@@ -1,0 +1,9 @@
+{
+  "plugins": [
+    {
+      "name": "motif",
+      "source": ".",
+      "description": "5-stage development workflow plugin for Claude Code — Research, Plan, Scaffold, Build, Validate. Language and codebase agnostic."
+    }
+  ]
+}
