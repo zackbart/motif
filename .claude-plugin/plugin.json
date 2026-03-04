@@ -5,6 +5,5 @@
   "author": {
     "name": "Zack Bart"
   },
-  "keywords": ["workflow", "development", "productivity"],
-  "hooks": "./hooks/hooks.json"
+  "keywords": ["workflow", "development", "productivity"]
 }
