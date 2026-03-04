@@ -1,7 +1,7 @@
 ---
 name: optimize
 description: >
-  Draft and optimize prompts for Claude. Helps structure a well-crafted prompt
+  Draft and optimize prompts for LLMs. Helps structure a well-crafted prompt
   before sending it. Works with system prompts, task prompts, and agentic prompts.
 argument-hint: "<what you want to accomplish>"
 disable-model-invocation: true
@@ -33,12 +33,12 @@ Write a complete, ready-to-use prompt based on the user's intent. Follow these p
 
 **Clarity**
 - Specify desired output format explicitly
-- Explain *why* constraints exist (Claude generalizes better from reasons)
+- Explain *why* constraints exist (models generalize better from reasons than bare rules)
 - Use action verbs ("Analyze this code" not "Could you suggest some analysis")
 
-**Claude-specific**
-- Avoid over-aggressive instructions ("ALWAYS", "CRITICAL", "MUST") — these cause overtriggering on Claude 4.x. Use normal language instead.
-- Do not use prefilled assistant responses (deprecated on Claude 4.6+)
+**Model-specific considerations**
+The guidance below is Claude-focused. Adapt for other models where applicable — the structural principles (role first, minimal constraints, explicit format) are universal.
+- Avoid over-aggressive instructions ("ALWAYS", "CRITICAL", "MUST") — these cause overtriggering on modern models. Use normal language instead.
 - For agentic prompts: address tool usage, reversibility, state management, and when subagents are warranted
 
 Present the draft in a code block so it is easy to copy.

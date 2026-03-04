@@ -1,27 +1,45 @@
 # Motif
 
-A Claude Code plugin that implements a structured 5-stage development workflow: **Research → Plan → Scaffold → Build → Validate**.
+A structured 5-stage development workflow for AI coding agents: **Research → Plan → Scaffold → Build → Validate**.
 
-Motif ensures you research before coding, plan with tradeoff analysis, track tasks explicitly, and validate against the original goal — all from within Claude Code.
+Works with [Claude Code](https://claude.com/claude-code), [OpenAI Codex CLI](https://github.com/openai/codex), and any agent platform that supports the [Agent Skills](https://developers.openai.com/codex/skills/) standard.
+
+Motif ensures you research before coding, plan with tradeoff analysis, track tasks explicitly, and validate against the original goal.
 
 ## Installation
+
+### Claude Code
 
 ```bash
 claude plugin add zackbart/motif
 ```
 
+### Codex CLI
+
+Clone into your skills directory:
+
+```bash
+git clone https://github.com/zackbart/motif.git ~/.agents/skills/motif
+```
+
+### Other Agent Platforms
+
+Copy the `skills/` and `commands/` directories into your agent's skill discovery path.
+
 ## Usage
 
-Run the full workflow with:
+Run the full workflow:
 
 ```
-/motif:dev <task description>
+/motif:dev <task description>        # Claude Code
+$dev <task description>              # Codex CLI
 ```
 
 Or use [werk](https://github.com/zackbart/werk) for persistent task tracking:
 
 ```
-/motif:dev werk <task description>
+/motif:dev werk <task description>   # Claude Code
+$dev werk <task description>         # Codex CLI
 ```
 
 ## Workflow Stages
@@ -30,7 +48,7 @@ Each stage requires your approval before advancing to the next.
 
 ### 1. Research
 
-Spawns a read-only subagent to explore the codebase. Depth scales automatically based on task complexity (light / medium / heavy).
+Performs deep, read-only codebase exploration. Depth scales automatically based on task complexity (light / medium / heavy). On Claude Code, this can be delegated to a dedicated research subagent for efficiency.
 
 ### 2. Plan
 
@@ -38,7 +56,7 @@ Develops an implementation approach based on the research findings. Medium and h
 
 ### 3. Scaffold
 
-Creates a structured task list from the plan — either using Claude Code's native task tools or the `werk` CLI.
+Creates a structured task list from the plan using the platform's available task tracking tools, or the `werk` CLI.
 
 ### 4. Build
 
@@ -52,16 +70,26 @@ Verifies the implementation against the original request: goal check, test verif
 
 | Command | Description |
 |---------|-------------|
-| `/motif:optimize` | Prompt drafting assistant for system and agentic prompts |
-| `/motif:update-docs` | Updates project documentation to reflect current codebase state |
+| `optimize` | Prompt drafting assistant for system and agentic prompts |
+| `update-docs` | Updates project documentation to reflect current codebase state |
+
+## Platform-Specific Features
+
+| Feature | Claude Code | Codex CLI |
+|---------|-------------|-----------|
+| Research subagent | Dedicated agent (model: sonnet) | Inline in main context |
+| Task tracking | Native task tools | update_plan / werk CLI |
+| Session hooks | SessionStart hook | AGENTS.md |
+| Plugin distribution | Marketplace | Git clone |
 
 ## Project Structure
 
 ```
-agents/         # Subagent definitions (researcher)
-commands/       # Additional commands (optimize, update-docs)
-hooks/          # Session lifecycle hooks
 skills/dev/     # Core 5-stage workflow + reference guides
+agents/         # Subagent definitions (Claude Code enhancement)
+commands/       # Additional commands (optimize, update-docs)
+hooks/          # Session lifecycle hooks (Claude Code)
+AGENTS.md       # Session priming (Codex CLI)
 ```
 
 ## License

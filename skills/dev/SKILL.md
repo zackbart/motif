@@ -3,8 +3,8 @@ name: dev
 description: >
   Personal development workflow orchestrator. Use when starting any development
   task — bug fixes, features, refactors, or explorations. Runs a 5-stage process:
-  Research, Plan, Scaffold, Build, Validate. Invoke with /motif:dev <task> for native
-  task tracking, or /motif:dev werk <task> to use the werk CLI.
+  Research, Plan, Scaffold, Build, Validate. Supports native task tracking or
+  the werk CLI for persistent tracking.
 disable-model-invocation: true
 argument-hint: "[werk] <task description>"
 allowed-tools: "Read, Grep, Glob, Bash, Write, Edit, Agent, TaskCreate, TaskUpdate, TaskList, TaskGet, AskUserQuestion"
@@ -18,8 +18,8 @@ You are running the motif workflow — a 5-stage development process with user a
 
 Parse $ARGUMENTS to determine the mode:
 
-- If the first word of $ARGUMENTS is "werk", use **werk mode**: strip "werk" from the front and use the remainder as the task description. In the Scaffold stage, create tasks using `werk` CLI commands via Bash.
-- Otherwise, use **native mode**: use all of $ARGUMENTS as the task description. In the Scaffold stage, create tasks using the TaskCreate tool.
+- If the first word of $ARGUMENTS is "werk", use **werk mode**: strip "werk" from the front and use the remainder as the task description. In the Scaffold stage, create tasks using `werk` CLI commands.
+- Otherwise, use **native mode**: use all of $ARGUMENTS as the task description. In the Scaffold stage, create tasks using the available task tracking tools.
 
 Store the parsed task description and mode for use throughout the workflow.
 
@@ -53,12 +53,29 @@ Wait for the user's response before proceeding. Do not auto-advance.
 
 ## Stage 1: Research
 
-Spawn the `researcher` subagent using the Agent tool. Pass it:
-- The task description
-- The complexity level (light, medium, or heavy)
-- Any specific files, modules, or areas the user mentioned
+Perform deep codebase research before planning. This is a read-only exploration phase — do not create, edit, or delete any files.
 
-The researcher will return a structured artifact with relevant files, patterns, git context, constraints, and risks.
+If a subagent capability is available (e.g., a dedicated research agent), you may delegate this research to it. Otherwise, perform the research directly using the instructions below.
+
+**Depth Calibration** (scale effort to complexity):
+- **Light**: Quick targeted lookup. Find the 1-3 most relevant files. Check for obvious patterns. Minimize tool calls.
+- **Medium**: Standard exploration. Map the relevant module structure, identify patterns, check test coverage, review recent git history for the area.
+- **Heavy**: Deep dive. Comprehensive module mapping, dependency tracing, architectural pattern analysis, thorough git archaeology (blame, log), related test suites, documentation review, similar precedents in the codebase.
+
+**Research Process:**
+1. **Orient** — understand project structure (look for package.json, Cargo.toml, pyproject.toml, go.mod, etc. at the root; scan top-level directories)
+2. **Locate** — find files relevant to the task using file search and content search
+3. **Understand** — read key files to understand current implementation
+4. **Context** — check git history for recent changes in the area (`git log --oneline -20 -- <path>`)
+5. **Patterns** — identify coding conventions, testing patterns, and architectural decisions relevant to the task
+6. **Constraints** — note any configuration, CI, linting, or type-checking constraints that will affect implementation
+
+**Produce a research artifact with these sections:**
+- **Relevant Files** — each file with a 1-line description of its relevance
+- **Patterns & Conventions** — how similar features/fixes are implemented, naming conventions, testing patterns
+- **Git Context** — recent changes in the affected area, who has been working on this code
+- **Constraints** — build/CI requirements, type system constraints, linting rules, dependencies
+- **Risks & Considerations** — fragile or heavily coupled areas, edge cases, missing test coverage
 
 Present a summary of the research findings to the user at the pause point.
 
@@ -85,13 +102,13 @@ Present the plan to the user at the pause point.
 
 Create a structured task list from the plan. Each task should be a single, independently verifiable unit of work.
 
-**Native mode** — use TaskCreate:
-- Create tasks with clear subjects, descriptions, and activeForm values
-- Set up dependencies between tasks using TaskUpdate with addBlockedBy/addBlocks where order matters
+**Native mode** — use the available task tracking tools to:
+- Create tasks with clear subjects and descriptions
+- Set up dependencies between tasks where order matters
 - Include a task for writing/updating tests
 - Include a final task for validating the overall goal
 
-**Werk mode** — use Bash to run `werk` CLI commands:
+**Werk mode** — use shell commands to run `werk` CLI:
 - Use the equivalent werk commands for task creation and dependency management
 - Follow the same task structure as native mode
 
@@ -104,7 +121,7 @@ Present the task list to the user at the pause point. They may want to add, remo
 Execute the plan by working through the scaffolded tasks in order.
 
 For each task:
-1. Mark it as in_progress (TaskUpdate or werk equivalent)
+1. Mark it as in-progress using the available task tracking tools (or werk equivalent)
 2. Implement the change
 3. If the task includes tests, write and run them
 4. Mark it as completed
