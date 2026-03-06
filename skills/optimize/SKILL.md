@@ -1,10 +1,12 @@
 ---
 name: optimize
 description: >
-  Draft and optimize prompts for LLMs. Helps structure a well-crafted prompt
-  before sending it. Works with system prompts, task prompts, and agentic prompts.
+  Prompt engineering assistant optimized for Claude models. Drafts and refines
+  system prompts, task prompts, and agentic prompts following Anthropic best
+  practices. Helps structure effective prompts before sending them.
 argument-hint: "<what you want to accomplish>"
 disable-model-invocation: true
+allowed-tools: "Read, AskUserQuestion"
 ---
 
 # Prompt Drafting Assistant

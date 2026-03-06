@@ -14,7 +14,7 @@ Motif ensures you research before coding, plan with tradeoff analysis, track tas
 npx skills add zackbart/motif
 ```
 
-This installs the `dev` skill to whichever agent platforms you have installed.
+This installs skills to whichever agent platforms you have installed.
 
 ### Claude Code (full plugin)
 
@@ -22,7 +22,7 @@ This installs the `dev` skill to whichever agent platforms you have installed.
 claude plugin add zackbart/motif
 ```
 
-Includes the core workflow plus additional commands (`optimize`, `update-docs`), a dedicated research subagent, and session hooks.
+Includes all skills plus dedicated subagents (researcher, critic, docs-scanner, docs-writer) and session hooks.
 
 ### Codex CLI
 
@@ -32,10 +32,13 @@ git clone https://github.com/zackbart/motif.git ~/.agents/skills/motif
 
 ## Usage
 
-Invoke the `dev` skill using your agent's skill invocation method:
+Invoke skills using your agent's skill invocation method:
 
 ```
 /motif:dev <task description>        # Claude Code
+/motif:optimize <prompt goal>        # Claude Code
+/motif:second-opinion                # Claude Code
+/motif:update-docs [focus area]      # Claude Code
 $dev <task description>              # Codex CLI
 ```
 
@@ -76,9 +79,9 @@ When installed as a Claude Code plugin, motif includes additional features:
 
 | Feature | Description |
 |---------|-------------|
-| Research subagent | Dedicated agent on Sonnet for faster, cheaper research |
-| `optimize` command | Prompt drafting assistant for system and agentic prompts |
-| `update-docs` command | Updates project documentation to reflect current codebase |
+| Research subagent | Dedicated agent on Sonnet for codebase exploration |
+| Critic subagent | Adversarial reviewer for pressure-testing plans |
+| Docs scanner/writer subagents | Parallel doc auditing and updating |
 | Session hooks | Reminds you about the workflow on session start |
 
 ## Platform Compatibility
@@ -88,16 +91,18 @@ When installed as a Claude Code plugin, motif includes additional features:
 | 5-stage workflow | Yes | Yes | Yes |
 | Research subagent | Dedicated agent | Inline | Inline |
 | Task tracking | Native task tools | update_plan / werk | Platform-dependent / werk |
-| Extra commands | optimize, update-docs | — | — |
+| Subagents | researcher, critic, docs-scanner, docs-writer | Inline | Inline |
 | Distribution | Plugin marketplace | Git clone | npx skills |
 
 ## Project Structure
 
 ```
-skills/dev/          # Core 5-stage workflow (universal skill)
-  references/        # Prompt engineering reference guides
-agents/              # Research subagent (Claude Code)
-commands/            # Additional commands (Claude Code)
+skills/dev/              # Core 5-stage workflow (universal skill)
+  references/            # Prompt engineering reference guides
+skills/optimize/         # Prompt engineering assistant (universal skill)
+skills/second-opinion/   # Adversarial plan critique (universal skill)
+skills/update-docs/      # Documentation auditor and updater (universal skill)
+agents/                  # Subagents: researcher, critic, docs-scanner, docs-writer
 hooks/               # Session lifecycle hooks (Claude Code)
 AGENTS.md            # Session priming (Codex CLI)
 .claude-plugin/      # Plugin manifest (Claude Code)
