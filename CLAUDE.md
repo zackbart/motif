@@ -1,12 +1,12 @@
 # Motif — Claude Code Plugin
 
-A cross-platform development workflow plugin. Version 0.3.0.
+A cross-platform development workflow plugin. Version 0.3.1.
 
 ## Project structure
 
 - `skills/` — universal skills (work via npx skills and as slash commands)
   - `dev/` — 5-stage workflow orchestrator (Research, Plan, Scaffold, Build, Validate)
-  - `optimize/` — prompt engineering assistant for Claude models
+  - `optimize-prompt/` — prompt engineering assistant for Claude models
   - `second-opinion/` — spawns adversarial critic subagent to pressure-test plans
   - `update-docs/` — documentation auditor with scanner/writer subagents
 - `agents/` — Claude Code subagents (Sonnet, read-only unless noted)

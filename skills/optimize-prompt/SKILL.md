@@ -1,5 +1,5 @@
 ---
-name: optimize
+name: optimize-prompt
 description: >
   Prompt engineering assistant optimized for Claude models. Drafts and refines
   system prompts, task prompts, and agentic prompts following Anthropic best

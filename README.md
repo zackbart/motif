@@ -36,7 +36,7 @@ Invoke skills using your agent's skill invocation method:
 
 ```
 /motif:dev <task description>        # Claude Code
-/motif:optimize <prompt goal>        # Claude Code
+/motif:optimize-prompt <prompt goal> # Claude Code
 /motif:second-opinion                # Claude Code
 /motif:update-docs [focus area]      # Claude Code
 $dev <task description>              # Codex CLI
@@ -99,7 +99,7 @@ When installed as a Claude Code plugin, motif includes additional features:
 ```
 skills/dev/              # Core 5-stage workflow (universal skill)
   references/            # Prompt engineering reference guides
-skills/optimize/         # Prompt engineering assistant (universal skill)
+skills/optimize-prompt/  # Prompt engineering assistant (universal skill)
 skills/second-opinion/   # Adversarial plan critique (universal skill)
 skills/update-docs/      # Documentation auditor and updater (universal skill)
 agents/                  # Subagents: researcher, critic, docs-scanner, docs-writer
