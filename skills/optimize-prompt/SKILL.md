@@ -5,7 +5,6 @@ description: >
   system prompts, task prompts, and agentic prompts following Anthropic best
   practices. Helps structure effective prompts before sending them.
 argument-hint: "<what you want to accomplish>"
-disable-model-invocation: true
 allowed-tools: "Read, AskUserQuestion"
 ---
 

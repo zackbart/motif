@@ -11,8 +11,7 @@ compatibility: >
   research can be delegated to a dedicated subagent for efficiency.
 metadata:
   author: zackbart
-  version: "0.3.1"
-disable-model-invocation: true
+  version: "0.3.2"
 argument-hint: "[werk] <task description>"
 allowed-tools: "Read, Grep, Glob, Bash, Write, Edit, Agent, TaskCreate, TaskUpdate, TaskList, TaskGet, AskUserQuestion"
 ---

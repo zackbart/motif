@@ -6,7 +6,6 @@ description: >
   docs and a writer subagent to apply approved changes. Optionally scoped to
   a specific area via arguments.
 argument-hint: "[focus area, e.g. 'README', 'api docs', 'installation instructions']"
-disable-model-invocation: true
 allowed-tools: "Agent, Read, Grep, Glob, Bash, AskUserQuestion"
 ---
 
