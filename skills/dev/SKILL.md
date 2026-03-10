@@ -3,151 +3,146 @@ name: dev
 description: >
   Personal development workflow orchestrator. Use when starting any development
   task — bug fixes, features, refactors, or explorations. Runs a 5-stage process:
-  Research, Plan, Scaffold, Build, Validate. Supports native task tracking or
-  the werk CLI for persistent tracking.
+  Research, Plan, Scaffold, Build, Validate. First three stages have user
+  approval gates; Build and Validate run autonomously.
 license: MIT
 compatibility: >
   Works with any agent that supports the Agent Skills standard. On Claude Code,
   research can be delegated to a dedicated subagent for efficiency.
 metadata:
   author: zackbart
-  version: "0.3.2"
+  version: "0.4.0"
 argument-hint: "[werk] <task description>"
 allowed-tools: "Read, Grep, Glob, Bash, Write, Edit, Agent, TaskCreate, TaskUpdate, TaskList, TaskGet, AskUserQuestion"
 ---
 
 # Motif Development Workflow
 
-You are running the motif workflow — a 5-stage development process with user approval gates between each stage.
+You are running the motif workflow — a 5-stage development process. The first three stages have user approval gates. Build and Validate run autonomously.
 
 ## Argument Parsing
 
-Parse $ARGUMENTS to determine the mode:
+If the first word of $ARGUMENTS is "werk", strip it and use the remainder as the task description. In the Scaffold stage, use the `/werk` skill for task creation instead of native task tracking tools.
 
-- If the first word of $ARGUMENTS is "werk", use **werk mode**: strip "werk" from the front and use the remainder as the task description. In the Scaffold stage, create tasks using `werk` CLI commands.
-- Otherwise, use **native mode**: use all of $ARGUMENTS as the task description. In the Scaffold stage, create tasks using the available task tracking tools.
-
-Store the parsed task description and mode for use throughout the workflow.
+Otherwise, use all of $ARGUMENTS as the task description and native task tracking tools throughout.
 
 ## Complexity Assessment
 
-Before starting, assess task complexity on a 3-point scale based on the task description:
+Before starting, assess task complexity on a 3-point scale:
 
 - **Light** (quick bug fix, small tweak, config change): abbreviated research, minimal planning, 1-3 tasks
 - **Medium** (feature addition, moderate refactor, new test coverage): standard research, full planning, 3-8 tasks
 - **Heavy** (large refactor, new system, architecture change): deep research, thorough planning with tradeoff analysis, 8+ tasks
 
-State your complexity assessment to the user before beginning Stage 1.
+State your assessment to the user before beginning Stage 1.
 
 ---
 
-## Stage Execution Protocol
+## Pause Point Protocol
 
-Run each stage sequentially. After completing each stage, present a summary of what was produced and ask the user how to proceed:
+After completing Stages 1-3, present a summary and ask:
 
-> **[Stage Name] complete.** [Brief summary of output]
+> **[Stage Name] complete.** [Brief summary]
 >
-> Ready to proceed to [Next Stage Name]?
-> - **go** — proceed to next stage
+> Ready for [Next Stage]?
+> - **go** — proceed
 > - **skip** — skip next stage
-> - **redo** — re-run this stage (provide feedback)
-> - **stop** — end the workflow here
+> - **redo** — re-run with feedback
+> - **stop** — end here
 
-Wait for the user's response before proceeding. Do not auto-advance.
+Do not auto-advance through stages 1-3. Stages 4-5 run without pausing.
 
 ---
 
 ## Stage 1: Research
 
-Perform deep codebase research before planning. This is a read-only exploration phase — do not create, edit, or delete any files.
+Read-only codebase exploration. Do not create, edit, or delete any files.
 
-If a subagent capability is available (e.g., a dedicated research agent), you may delegate this research to it. Otherwise, perform the research directly using the instructions below.
+If a subagent capability is available (e.g., a dedicated research agent), delegate to it. Otherwise, perform research directly.
 
-**Depth Calibration** (scale effort to complexity):
-- **Light**: Quick targeted lookup. Find the 1-3 most relevant files. Check for obvious patterns. Minimize tool calls.
-- **Medium**: Standard exploration. Map the relevant module structure, identify patterns, check test coverage, review recent git history for the area.
-- **Heavy**: Deep dive. Comprehensive module mapping, dependency tracing, architectural pattern analysis, thorough git archaeology (blame, log), related test suites, documentation review, similar precedents in the codebase.
+**Depth Calibration:**
+- **Light**: Find the 1-3 most relevant files. Check for obvious patterns. Minimize tool calls.
+- **Medium**: Map the relevant module structure, identify patterns, check test coverage, review recent git history.
+- **Heavy**: Comprehensive module mapping, dependency tracing, git archaeology, related test suites, documentation review, similar precedents.
 
 **Research Process:**
-1. **Orient** — understand project structure (look for package.json, Cargo.toml, pyproject.toml, go.mod, etc. at the root; scan top-level directories)
-2. **Locate** — find files relevant to the task using file search and content search
+1. **Orient** — project structure (package.json, Cargo.toml, pyproject.toml, go.mod, etc.; top-level directories)
+2. **Locate** — find files relevant to the task
 3. **Understand** — read key files to understand current implementation
-4. **Context** — check git history for recent changes in the area (`git log --oneline -20 -- <path>`)
-5. **Patterns** — identify coding conventions, testing patterns, and architectural decisions relevant to the task
-6. **Constraints** — note any configuration, CI, linting, or type-checking constraints that will affect implementation
+4. **Context** — git history for recent changes (`git log --oneline -20 -- <path>`)
+5. **Patterns** — coding conventions, testing patterns, architectural decisions
+6. **Toolchain** — find the test, build, and lint commands so you can run them in later stages
 
-**Produce a research artifact with these sections:**
-- **Relevant Files** — each file with a 1-line description of its relevance
-- **Patterns & Conventions** — how similar features/fixes are implemented, naming conventions, testing patterns
-- **Git Context** — recent changes in the affected area, who has been working on this code
-- **Constraints** — build/CI requirements, type system constraints, linting rules, dependencies
-- **Risks & Considerations** — fragile or heavily coupled areas, edge cases, missing test coverage
-
-Present a summary of the research findings to the user at the pause point.
+**Output:**
+- **Relevant Files** — each with a 1-line description
+- **Patterns & Conventions** — how similar work is done in this codebase
+- **Constraints** — build/CI requirements, type system, linting rules
+- **Toolchain** — exact commands for test, build, lint
+- **Risks** — fragile areas, edge cases, missing coverage
 
 ---
 
 ## Stage 2: Plan
 
-Using the research findings, think through the implementation approach. Include:
+Using research findings, produce an implementation plan.
 
-- **Approach**: What will be built/changed and how
-- **Key files**: Which files will be created, modified, or deleted
-- **Testing strategy**: What tests to write and how to verify correctness
+**Output:**
+- **Approach** — what will change and how (be specific about the technique, not just "modify X")
+- **Files** — which files will be created, modified, or deleted
+- **Testing** — what tests to write or update, how to verify correctness
+- **Tradeoffs** (medium/heavy only) — alternatives considered and why this approach wins
 
-Scale depth by complexity:
-- **Light**: A few sentences covering approach and key files
-- **Medium**: Full plan with approach, files, testing strategy, and brief tradeoff notes
-- **Heavy**: Thorough plan with alternatives considered, tradeoff analysis, risk assessment, and dependency mapping
-
-Present the plan to the user at the pause point.
+Scale depth to complexity. A light plan can be a few sentences. A heavy plan needs alternatives and risk assessment.
 
 ---
 
 ## Stage 3: Scaffold
 
-Create a structured task list from the plan. Each task should be a single, independently verifiable unit of work.
+Decompose the plan into a task list. Each task should be a single, verifiable unit of work.
 
-**Native mode** — use the available task tracking tools to:
-- Create tasks with clear subjects and descriptions
-- Set up dependencies between tasks where order matters
-- Include a task for writing/updating tests
-- Include a final task for validating the overall goal
+**Native mode** — use the available task tracking tools (TaskCreate, TaskUpdate, etc.) to create and manage tasks.
 
-**Werk mode** — use shell commands to run `werk` CLI:
-- Use the equivalent werk commands for task creation and dependency management
-- Follow the same task structure as native mode
+**Werk mode** — use the `/werk` skill to create and manage tasks.
 
-Present the task list to the user at the pause point. They may want to add, remove, or reorder tasks.
+For both modes:
+- Set dependencies where order matters
+- Include test tasks alongside the code they verify (not as a separate "write all tests" task)
+- Final task: validate the overall goal
+
+Present the task list. The user may add, remove, or reorder before approving.
 
 ---
 
 ## Stage 4: Build
 
-Execute the plan by working through the scaffolded tasks in order.
+**This stage runs autonomously.** Work through tasks in order without stopping for approval on each one.
 
 For each task:
-1. Mark it as in-progress using the available task tracking tools (or werk equivalent)
+1. Mark in-progress
 2. Implement the change
-3. If the task includes tests, write and run them
-4. Mark it as completed
-5. Brief status update to the user
+3. If tests are part of this task, write and run them
+4. Mark completed
 
-If you encounter a blocker or something that deviates from the plan, stop and inform the user rather than improvising.
+**When to stop and ask:**
+- A task requires a design decision not covered by the plan
+- Tests fail in a way that suggests the plan is wrong (not just a typo)
+- You discover the plan missed something significant
 
-After all tasks are complete, present a summary of what was built.
+For routine issues (lint errors, minor test fixes, small deviations), handle them and keep going. Use your judgment — the plan is a guide, not a contract.
+
+After all tasks complete, proceed directly to Validate.
 
 ---
 
 ## Stage 5: Validate
 
-Verify the work against the original task description:
+Run automatically after Build completes.
 
-1. **Goal check**: Does the implementation satisfy the original request?
-2. **Test verification**: Run the full test suite (or relevant subset). Report results.
-3. **Diff review**: Summarize all files changed with a brief description of each change.
-4. **Loose ends**: Flag anything incomplete, any TODO comments added, any known limitations.
+1. **Goal check** — does the implementation satisfy the original task description?
+2. **Tests** — run the test command discovered in Research. Report pass/fail.
+3. **Diff summary** — all files changed with a brief description of each change
+4. **Loose ends** — anything incomplete, TODO comments added, known limitations
 
-Present the validation report. If issues are found, inform the user they can:
-- Say **fix** with details to go back to Build and address specific issues
-- Say **done** to accept the current state
+Present the validation report. If issues exist:
+- **fix** + details → go back to Build for targeted fixes
+- **done** → accept current state
